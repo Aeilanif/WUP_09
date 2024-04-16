@@ -19,6 +19,7 @@ require(tidyverse)
 ```
 
 # Predicting Fish Weight
+We will find the best model by using two variables to predict the weight of the perch,then we will compare this to the model that is best overall.
 
 
 ## Perch
@@ -33,25 +34,32 @@ perch <- select(perch,-Species)
 ```
 
 ### Best Models
+```{r}
+perchModel <- lm(Weight~., data=perch)
+summary(perchModel)
+```
+```{r}
+library(leaps)
+regsubsets.out <-
+    regsubsets(Weight ~ .,
+               data = perch,
+               nbest = 1,       # 1 best model for each number of predictors
+               nvmax = NULL,    # NULL for no limit on number of variables
+               force.in = NULL, force.out = NULL,
+               method = "exhaustive")
 
-We find best models for all three species.
+summary.out <- summary(regsubsets.out)
+as.data.frame(summary.out$outmat)
+library(car)
+subsets(regsubsets.out,statistic="adjr2",legend="bottomright",main="Adjusted R^2")
+```
+
 
 ### Best Two regressor model
 
-```{r}
-perchmodel <- lm(Weight ~ Height + Width, data = perch)
-summary.lm(perchmodel)
-```
 
-The best two regressor model is height and weight because those are the highest adjusted r squared.
 
 ## Pike
-```{r}
-Pike = filter(Fish, Species == 'Pike')
-Pike = subset(Pike,select = -Species)
-weightPike =lm(Weight~Length1 + Length2 + Length3 + Height+ Width, data =Pike)
-summary.lm(weightPike)
-```
 
 
 ### Best Models
